@@ -1,0 +1,12 @@
+export_type=PLAIN
+export_name=example
+export_print=033bd91234b117e4f0d644c3c95e35bf
+export_template=$ШЛЯХ_ДО_ШАБЛОНУ
+mail_to=some@server.com
+mail_from=author@example.com
+mail_smtp_address=smtp.example.com
+mail_smtp_login=author
+mail_smtp_password=mypass
+mail_smtp_con_port=465
+mail_smtp_con_security=ssl
+opt_log=1
