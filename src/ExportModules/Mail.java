@@ -65,7 +65,12 @@ public class Mail extends Export.Exporter {
             mailInit.put("mail.password", this.currSchema.currConfig.getProperty("mail_smtp_pass"));
             mailInit.put("mail.smtp.auth", "true");
         }
-
+        String defCharset;
+        if (this.currSchema.currConfig.getProperty("opt_charset") != null) {
+            defCharset = this.currSchema.currConfig.getProperty("opt_charset");
+        } else {
+            defCharset = "UTF-8";
+        }
         Session exportSes = Session.getDefaultInstance(mailInit, new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(mailInit.getProperty("mail.user"), mailInit.getProperty("mail.password"));
@@ -76,18 +81,21 @@ public class Mail extends Export.Exporter {
             message.setFrom(new InternetAddress(this.currSchema.currConfig.getProperty("mail_from")));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(this.currSchema.currConfig.getProperty("mail_to")));
             if (this.currSchema.currConfig.getProperty("mail_subject") != null) {
-                message.setSubject(this.currSchema.currConfig.getProperty("mail_subject"));
+                message.setSubject(this.currSchema.currConfig.getProperty("mail_subject"), defCharset);
             } else {
-                message.setSubject(this.exportedMessage.HEADER);
+                message.setSubject(this.exportedMessage.HEADER, defCharset);
             }
             message.setHeader("X-Mailer", "Ribbon System ExportMail module vx.1");
-            message.setText(this.exportedContent);
+            message.setContent(this.exportedContent.getBytes(defCharset), "text/plain; charset=" + defCharset);
             Transport.send(message);
             if ("1".equals(this.currSchema.currConfig.getProperty("opt_log"))) {
                 IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 3, "прозведено експорт повідомлення " + this.exportedMessage.INDEX);
             }
             exportedMessage.PROPERTIES.add(new MessageClasses.MessageProperty(this.propertyType, "root", this.currSchema.currConfig.getProperty("export_print"), IOControl.serverWrapper.getDate()));
         } catch (MessagingException ex) {
+            IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 1, "неможливо відправити повідомлення");
+            ex.printStackTrace();
+        } catch (java.io.UnsupportedEncodingException ex) {
             IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 1, "неможливо відправити повідомлення");
             ex.printStackTrace();
         }
