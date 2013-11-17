@@ -87,10 +87,6 @@ public class Mail extends Export.Exporter {
         message.setHeader("X-Mailer", "Ribbon System ExportMail module vx.1");
         message.setContent(this.exportedContent.getBytes(defCharset), "text/plain; charset=" + defCharset);
         Transport.send(message);
-        if ("1".equals(this.currSchema.currConfig.getProperty("opt_log"))) {
-            IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 3, "прозведено експорт повідомлення " + this.exportedMessage.INDEX);
-        }
-        exportedMessage.PROPERTIES.add(new MessageClasses.MessageProperty(this.propertyType, "root", this.currSchema.currConfig.getProperty("export_print"), IOControl.serverWrapper.getDate()));
     }
 
     @Override
