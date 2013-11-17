@@ -47,7 +47,7 @@ public class Mail extends Export.Exporter {
     }
 
     @Override
-    protected void doExport() {
+    protected void doExport() throws Exception {
         final Properties mailInit = new Properties();
         mailInit.put("mail.smtp.host", this.currSchema.currConfig.getProperty("mail_smtp_address"));
         if (this.currSchema.currConfig.getProperty("mail_smtp_con_port") != null) {
@@ -76,39 +76,25 @@ public class Mail extends Export.Exporter {
 					return new PasswordAuthentication(mailInit.getProperty("mail.user"), mailInit.getProperty("mail.password"));
 				}
 			});
-        try {
-            MimeMessage message = new MimeMessage(exportSes);
-            message.setFrom(new InternetAddress(this.currSchema.currConfig.getProperty("mail_from")));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(this.currSchema.currConfig.getProperty("mail_to")));
-            if (this.currSchema.currConfig.getProperty("mail_subject") != null) {
-                message.setSubject(this.currSchema.currConfig.getProperty("mail_subject"), defCharset);
-            } else {
-                message.setSubject(this.exportedMessage.HEADER, defCharset);
-            }
-            message.setHeader("X-Mailer", "Ribbon System ExportMail module vx.1");
-            message.setContent(this.exportedContent.getBytes(defCharset), "text/plain; charset=" + defCharset);
-            Transport.send(message);
-            if ("1".equals(this.currSchema.currConfig.getProperty("opt_log"))) {
-                IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 3, "прозведено експорт повідомлення " + this.exportedMessage.INDEX);
-            }
-            exportedMessage.PROPERTIES.add(new MessageClasses.MessageProperty(this.propertyType, "root", this.currSchema.currConfig.getProperty("export_print"), IOControl.serverWrapper.getDate()));
-        } catch (MessagingException ex) {
-            IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 1, "неможливо відправити повідомлення");
-            ex.printStackTrace();
-        } catch (java.io.UnsupportedEncodingException ex) {
-            IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 1, "неможливо відправити повідомлення");
-            ex.printStackTrace();
+        MimeMessage message = new MimeMessage(exportSes);
+        message.setFrom(new InternetAddress(this.currSchema.currConfig.getProperty("mail_from")));
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress(this.currSchema.currConfig.getProperty("mail_to")));
+        if (this.currSchema.currConfig.getProperty("mail_subject") != null) {
+            message.setSubject(this.currSchema.currConfig.getProperty("mail_subject"), defCharset);
+        } else {
+            message.setSubject(this.exportedMessage.HEADER, defCharset);
         }
+        message.setHeader("X-Mailer", "Ribbon System ExportMail module vx.1");
+        message.setContent(this.exportedContent.getBytes(defCharset), "text/plain; charset=" + defCharset);
+        Transport.send(message);
+        if ("1".equals(this.currSchema.currConfig.getProperty("opt_log"))) {
+            IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 3, "прозведено експорт повідомлення " + this.exportedMessage.INDEX);
+        }
+        exportedMessage.PROPERTIES.add(new MessageClasses.MessageProperty(this.propertyType, "root", this.currSchema.currConfig.getProperty("export_print"), IOControl.serverWrapper.getDate()));
     }
 
     @Override
-    public void tryRecovery() {
+    public Boolean tryRecovery() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    @Override
-    protected void resetState() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }
