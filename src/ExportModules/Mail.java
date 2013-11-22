@@ -36,6 +36,16 @@ public class Mail extends Export.Exporter {
     public static String propertyType = "EXPORT_MAIL";
     
     /**
+     * SMTP session object.
+     */
+    private Session exportSession;
+    
+    /**
+     * Array of recipients addresses.
+     */
+    private String[] rcpArray;
+    
+    /**
      * Constructor redirect.
      * @param givenMessage message to export;
      * @param givenSchema export scheme reference;
@@ -71,21 +81,31 @@ public class Mail extends Export.Exporter {
         } else {
             defCharset = "UTF-8";
         }
-        Session exportSes = Session.getDefaultInstance(mailInit, new javax.mail.Authenticator() {
+        exportSession = Session.getDefaultInstance(mailInit, new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(mailInit.getProperty("mail.user"), mailInit.getProperty("mail.password"));
 				}
 			});
-        MimeMessage message = new MimeMessage(exportSes);
+        sendMessageAsMail(this.currSchema.currConfig.getProperty("mail_to"));
+    }
+    
+    /**
+     * Send current message as mail to the specified address.
+     * @param mailProps mail initiation properties;
+     * @param to current recipient address;
+     * @throws Exception all exception during sending.
+     */
+    private void sendMessageAsMail(String to) throws Exception {
+        MimeMessage message = new MimeMessage(exportSession);
         message.setFrom(new InternetAddress(this.currSchema.currConfig.getProperty("mail_from")));
-        message.addRecipient(Message.RecipientType.TO, new InternetAddress(this.currSchema.currConfig.getProperty("mail_to")));
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
         if (this.currSchema.currConfig.getProperty("mail_subject") != null) {
-            message.setSubject(this.currSchema.currConfig.getProperty("mail_subject"), defCharset);
+            message.setSubject(this.currSchema.currConfig.getProperty("mail_subject"), exportedCharset);
         } else {
-            message.setSubject(this.exportedMessage.HEADER, defCharset);
+            message.setSubject(this.exportedMessage.HEADER, exportedCharset);
         }
         message.setHeader("X-Mailer", "Ribbon System ExportMail module vx.1");
-        message.setContent(this.exportedContent.getBytes(defCharset), "text/plain; charset=" + defCharset);
+        message.setContent(this.exportedContent.getBytes(exportedCharset), "text/plain; charset=" + exportedCharset);
         Transport.send(message);
     }
 
