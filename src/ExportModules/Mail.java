@@ -75,18 +75,22 @@ public class Mail extends Export.Exporter {
             mailInit.put("mail.password", this.currSchema.currConfig.getProperty("mail_smtp_pass"));
             mailInit.put("mail.smtp.auth", "true");
         }
-        String defCharset;
-        if (this.currSchema.currConfig.getProperty("opt_charset") != null) {
-            defCharset = this.currSchema.currConfig.getProperty("opt_charset");
-        } else {
-            defCharset = "UTF-8";
-        }
         exportSession = Session.getDefaultInstance(mailInit, new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(mailInit.getProperty("mail.user"), mailInit.getProperty("mail.password"));
 				}
 			});
-        sendMessageAsMail(this.currSchema.currConfig.getProperty("mail_to"));
+        String[] rcpList = null;
+        if (this.currSchema.currConfig.getProperty("mail_rcp_list") != null) {
+            rcpList = this.readRcpList(this.currSchema.currConfig.getProperty("mail_rcp_list"));
+        }
+        if (rcpList != null) {
+            for (String rcp_address: rcpList) {
+                sendMessageAsMail(rcp_address);
+            }
+        } else {
+            sendMessageAsMail(this.currSchema.currConfig.getProperty("mail_to"));
+        }
     }
     
     /**
@@ -107,6 +111,18 @@ public class Mail extends Export.Exporter {
         message.setHeader("X-Mailer", "Ribbon System ExportMail module vx.1");
         message.setContent(this.exportedContent.getBytes(exportedCharset), "text/plain; charset=" + exportedCharset);
         Transport.send(message);
+    }
+    
+    /**
+     * Read recipient lists and return its lines.
+     * @return string array with recipients;
+     */
+    private String[] readRcpList(String path) {
+        String[] returned = null;
+        try {
+            returned = new String(java.nio.file.Files.readAllBytes(new java.io.File(path).toPath())).split("\n");
+        } catch (java.io.IOException ex) {}
+        return returned;
     }
 
     @Override
