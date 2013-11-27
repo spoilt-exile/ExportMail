@@ -104,7 +104,12 @@ public class Mail extends Export.Exporter {
         message.setFrom(new InternetAddress(this.currSchema.currConfig.getProperty("mail_from")));
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
         if (this.currSchema.currConfig.getProperty("mail_subject") != null) {
-            message.setSubject(this.currSchema.currConfig.getProperty("mail_subject"), exportedCharset);
+            if ("1".equals(this.currSchema.currConfig.getProperty("mail_subject_allow_template"))) {
+                Export.Formater headerFormater = new Export.Formater(this.currSchema.currConfig, this.currSchema.currConfig.getProperty("mail_subject"));
+                message.setSubject(headerFormater.format(exportedMessage, calledDir), exportedCharset);
+            } else {
+                message.setSubject(this.currSchema.currConfig.getProperty("mail_subject"), exportedCharset);
+            }
         } else {
             message.setSubject(this.exportedMessage.HEADER, exportedCharset);
         }
