@@ -41,11 +41,6 @@ public class Mail extends Export.Exporter {
     private Session exportSession;
     
     /**
-     * Array of recipients addresses.
-     */
-    private String[] rcpArray;
-    
-    /**
      * Constructor redirect.
      * @param givenMessage message to export;
      * @param givenSchema export scheme reference;
