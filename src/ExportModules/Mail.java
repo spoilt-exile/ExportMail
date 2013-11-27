@@ -122,10 +122,10 @@ public class Mail extends Export.Exporter {
      * Read recipient lists and return its lines.
      * @return string array with recipients;
      */
-    private String[] readRcpList(String path) {
+    private String[] readRcpList(String name) {
         String[] returned = null;
         try {
-            returned = new String(java.nio.file.Files.readAllBytes(new java.io.File(path).toPath())).split("\n");
+            returned = new String(java.nio.file.Files.readAllBytes(new java.io.File(IOControl.dispathcer.exportDirPath + "/" + name).toPath())).split("\n");
         } catch (java.io.IOException ex) {}
         return returned;
     }
