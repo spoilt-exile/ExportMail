@@ -108,7 +108,7 @@ public class Mail extends Export.Exporter {
         } else {
             message.setSubject(this.exportedMessage.HEADER, exportedCharset);
         }
-        message.setHeader("X-Mailer", "Ribbon System ExportMail module vx.1");
+        message.setHeader("X-Mailer", "Ribbon System ExportMail module");
         message.setContent(this.exportedContent.getBytes(exportedCharset), "text/plain; charset=" + exportedCharset);
         Transport.send(message);
     }
@@ -121,7 +121,11 @@ public class Mail extends Export.Exporter {
         String[] returned = null;
         try {
             returned = new String(java.nio.file.Files.readAllBytes(new java.io.File(IOControl.dispathcer.exportDirPath + "/" + name).toPath())).split("\n");
-        } catch (java.io.IOException ex) {}
+        } catch (java.io.IOException ex) {
+            IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 1, 
+            "неможливо прочитати список розсилки - експорт буде проведено до адреси у параметрі mail_to\n"
+            + "Шлях до файлу списку розсилки:" + IOControl.dispathcer.exportDirPath + "/" + name);
+        }
         return returned;
     }
 
