@@ -128,9 +128,4 @@ public class Mail extends Export.Exporter {
         }
         return returned;
     }
-
-    @Override
-    public Boolean tryRecovery() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }
