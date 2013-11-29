@@ -29,11 +29,8 @@ import Utils.IOControl;
  * Mail message export class.
  * @author Stanislav Nepochatov <spoilt.exile@gmail.com>
  */
+@Utils.RibbonIOModule(type="MAIL", property="EXPORT_MAIL", api_version=1)
 public class Mail extends Export.Exporter {
-    
-    public static String type = "MAIL";
-    
-    public static String propertyType = "EXPORT_MAIL";
     
     /**
      * SMTP session object.
