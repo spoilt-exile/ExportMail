@@ -29,7 +29,7 @@ import Utils.IOControl;
  * Mail message export class.
  * @author Stanislav Nepochatov <spoilt.exile@gmail.com>
  */
-@Utils.RibbonIOModule(type="MAIL", property="EXPORT_MAIL", api_version=1)
+@Utils.RibbonIOModule(type="MAIL", property="EXPORT_MAIL", api_version=2)
 public class Mail extends Export.Exporter {
     
     /**
@@ -117,11 +117,11 @@ public class Mail extends Export.Exporter {
     private String[] readRcpList(String name) {
         String[] returned = null;
         try {
-            returned = new String(java.nio.file.Files.readAllBytes(new java.io.File(IOControl.dispathcer.exportDirPath + "/" + name).toPath())).split("\n");
+            returned = new String(java.nio.file.Files.readAllBytes(new java.io.File(IOControl.EXPORT_DIR + "/" + name).toPath())).split("\n");
         } catch (java.io.IOException ex) {
             IOControl.serverWrapper.log(IOControl.EXPORT_LOGID + ":" + this.currSchema.name, 1, 
             "неможливо прочитати список розсилки - експорт буде проведено до адреси у параметрі mail_to\n"
-            + "Шлях до файлу списку розсилки:" + IOControl.dispathcer.exportDirPath + "/" + name);
+            + "Шлях до файлу списку розсилки:" + IOControl.EXPORT_DIR + "/" + name);
         }
         return returned;
     }
