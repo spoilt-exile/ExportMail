@@ -60,6 +60,9 @@ public class Mail extends Export.Exporter {
             switch (sec) {
                 case "ssl":
                     mailInit.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+                    mailInit.put("mail.smtp.socketFactory.port", this.currSchema.currConfig.getProperty("mail_smtp_con_port"));
+                    mailInit.put("mail.smtp.ssl.enable", true);
+                    break;
             }
         }
         if (this.currSchema.currConfig.getProperty("mail_smtp_login") != null && this.currSchema.currConfig.getProperty("mail_smtp_pass") != null) {
